@@ -63,7 +63,7 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 0;
   font-family: monospace;
-  font-size: 14px;
+  font-size: 16px;
   max-width: 400px;
   resize: vertical;
   padding: .5rem;

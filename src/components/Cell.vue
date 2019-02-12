@@ -5,7 +5,7 @@
       'box-right': boxRight,
       'box-left': boxLeft
     }">
-    <input type="text" pattern="[1-9]" v-model="cell" />
+    <input inputmode="numeric" type="text" pattern="[0-9]*" v-model="cell" />
   </div>
 </template>
 
