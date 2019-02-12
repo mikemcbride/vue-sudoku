@@ -59,8 +59,20 @@ export default {
 }
 
 textarea {
-  width: 100%;
+  background: #f5f6f7;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  font-family: monospace;
+  font-size: 14px;
   max-width: 400px;
+  resize: vertical;
+  padding: .5rem;
+  width: 100%;
+  
+  &:focus {
+    border-color: #0074d9;
+    outline: none;
+  }
 }
 
 button {
