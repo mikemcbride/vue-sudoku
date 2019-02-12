@@ -12,7 +12,7 @@ action "deploy" {
 
 # Filter for master branch
 action "master-branch-filter" {
-  needs = "alias"
+  needs = "deploy"
   uses = "actions/bin/filter@master"
   args = "branch master"
 }
