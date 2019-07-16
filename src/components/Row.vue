@@ -1,10 +1,11 @@
 <template lang="html">
   <div class="row">
     <Cell
-      v-for="(cell, index) in cells"
+      v-for="(cell, index) in row"
       :key="index"
-      :row="row"
-      :col="index" />
+      :row="rowIndex"
+      :col="index"
+      :cell="cell" />
   </div>
 </template>
 
@@ -15,17 +16,16 @@ export default {
   name: 'Row',
   props: {
     row: {
+      type: Array,
+      required: true
+    },
+    rowIndex: {
       type: Number,
       required: true
     }
   },
   components: {
     Cell,
-  },
-  computed: {
-    cells() {
-      return this.$store.state.grid[this.row]
-    }
   },
 }
 </script>

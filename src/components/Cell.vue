@@ -5,7 +5,7 @@
       'box-right': boxRight,
       'box-left': boxLeft
     }">
-    <input inputmode="numeric" type="text" pattern="[0-9]*" v-model="cell" />
+    <input inputmode="numeric" type="text" pattern="[0-9]*" v-model="cell.value" />
   </div>
 </template>
 
@@ -13,6 +13,10 @@
 export default {
   name: 'Cell',
   props: {
+    cell: {
+      type: Object,
+      required: true
+    },
     col: {
       type: Number,
       required: true
@@ -23,19 +27,6 @@ export default {
     }
   },
   computed: {
-    cell: {
-      get() {
-        return this.$store.state.grid[this.row][this.col].value
-      },
-      set(val) {
-        const payload = {
-          val,
-          row: this.row,
-          col: this.col
-        }
-        this.$store.dispatch('setCell', payload)
-      }
-    },
     boxLeft() {
       return this.col % 3 === 0
     },
