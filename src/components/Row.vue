@@ -5,7 +5,8 @@
       :key="index"
       :row="rowIndex"
       :col="index"
-      :cell="cell" />
+      :cell="cell"
+      @updated="handleCellUpdated" />
   </div>
 </template>
 
@@ -26,6 +27,11 @@ export default {
   },
   components: {
     Cell,
+  },
+  methods: {
+    handleCellUpdated(payload) {
+      this.$emit('updated', payload)
+    }
   },
 }
 </script>

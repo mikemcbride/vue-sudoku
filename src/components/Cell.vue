@@ -5,7 +5,12 @@
       'box-right': boxRight,
       'box-left': boxLeft
     }">
-    <input inputmode="numeric" type="text" pattern="[0-9]*" v-model="cell.value" />
+    <input
+      inputmode="numeric"
+      type="text"
+      pattern="[1-9]"
+      :value="cell.value"
+      @input="handleInputChange" />
   </div>
 </template>
 
@@ -38,6 +43,21 @@ export default {
     },
     boxTop() {
       return this.row % 3 === 0
+    },
+  },
+  methods: {
+    handleInputChange(e) {
+      let newVal = parseInt(e.target.value, 10)
+      
+      if (isNaN(newVal)) {
+        newVal = null
+      }
+      
+      this.$emit('updated', {
+        val: newVal,
+        row: this.row,
+        col: this.col
+      })
     }
   }
 }

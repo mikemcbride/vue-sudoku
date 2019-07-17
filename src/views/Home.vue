@@ -2,7 +2,7 @@
   <div class="home">
     <section>
       <div>
-        <Grid :grid="grid" />
+        <Grid :grid="grid" @updated="setCell" />
       </div>
       <p>Calculations required: {{ calculations }}</p>
       <p>Time to solve: {{ solveTime }}</p>
@@ -40,7 +40,8 @@ export default {
       grid: deepClone(defaultGrid),
       calculations: 0,
       snapshots: [],
-      solveTime: 0
+      solveTime: 0,
+      startTime: 0
     }
   },
   methods: {
@@ -96,7 +97,7 @@ export default {
     
     async solve() {
       this.solveTime = 0
-      this.start = Date.now()
+      this.startTime = Date.now()
       
       if (this.isSolved() === false) {
         await this.makePass()
@@ -112,6 +113,7 @@ export default {
       let grid = deepClone(defaultGrid)
       this.SET_GRID(grid)
       this.SET_CALCULATIONS(0)
+      this.
       this.solveTime = 0
     },
     
@@ -146,13 +148,9 @@ export default {
       // this only gets triggered when the user manually updates the value,
       // so we can assume that the cell is solved.
       const cell = {
-        value: parseInt(val, 10),
-        solved: true,
-        possibleValues: []
-      }
-      
-      if (isNaN(cell.value)) {
-        cell.value = null
+        value: val,
+        solved: val === null ? false : true,
+        possibleValues: val === null ? [...allPossibleCellValues] : []
       }
       
       this.SET_CELL({ row, col, cell })
@@ -243,7 +241,7 @@ export default {
           this.makePass()
         }, 0)
       } else {
-        let finish = Date.now() - this.start
+        let finish = Date.now() - this.startTime
         this.solveTime = `${finish / 1000}s`
       }
     }

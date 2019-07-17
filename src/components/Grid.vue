@@ -4,7 +4,8 @@
       v-for="(row, index) in grid"
       :key="index"
       :row="row"
-      :row-index="index" />
+      :row-index="index"
+      @updated="handleCellUpdated" />
   </div>
 </template>
 
@@ -20,7 +21,12 @@ export default {
       type: Array,
       required: true
     },
-  }
+  },
+  methods: {
+    handleCellUpdated(payload) {
+      this.$emit('updated', payload)
+    }
+  },
 }
 </script>
 
