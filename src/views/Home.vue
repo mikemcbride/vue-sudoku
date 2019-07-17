@@ -17,7 +17,7 @@
       <button @click="loadPuzzle('hard')">Hard Puzzle</button>
       <button @click="loadPuzzle('evil')">Evil Puzzle</button>
       <button @click="loadPuzzle('hardest')">World's Hardest Sudoku</button>
-      <a href="https://gizmodo.com/can-you-solve-the-10-hardest-logic-puzzles-ever-created-1064112665" target="_blank">Worlds Hardest Sudoku according to this article</a>
+      <a href="https://www.conceptispuzzles.com/index.aspx?uri=info/article/424" target="_blank">Worlds Hardest Sudoku according to this article</a>
     </aside>
   </div>
 </template>
