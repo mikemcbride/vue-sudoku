@@ -16,6 +16,8 @@
       <button @click="loadPuzzle('medium')">Medium Puzzle</button>
       <button @click="loadPuzzle('hard')">Hard Puzzle</button>
       <button @click="loadPuzzle('evil')">Evil Puzzle</button>
+      <button @click="loadPuzzle('hardest')">World's Hardest Sudoku</button>
+      <a href="https://gizmodo.com/can-you-solve-the-10-hardest-logic-puzzles-ever-created-1064112665" target="_blank">Worlds Hardest Sudoku according to this article</a>
     </aside>
   </div>
 </template>
@@ -118,7 +120,7 @@ export default {
       let grid = deepClone(defaultGrid)
       this.SET_GRID(grid)
       this.SET_CALCULATIONS(0)
-      this.this.solveTime = 0
+      this.solveTime = 0
     },
 
     SET_CELL({ row, col, cell }) {
@@ -302,6 +304,15 @@ button {
 
   &:hover {
     background: #0074d9;
+  }
+}
+
+a {
+  color: #0074d9;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 
