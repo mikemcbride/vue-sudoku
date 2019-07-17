@@ -1,16 +1,19 @@
 <template lang="html">
-  <div :class="{
+  <div
+    :class="{
       'box-top': boxTop,
       'box-bottom': boxBottom,
       'box-right': boxRight,
       'box-left': boxLeft
-    }">
+    }"
+  >
     <input
       inputmode="numeric"
       type="text"
       pattern="[1-9]"
       :value="cell.value"
-      @input="handleInputChange" />
+      @input="handleInputChange"
+    />
   </div>
 </template>
 
@@ -43,16 +46,16 @@ export default {
     },
     boxTop() {
       return this.row % 3 === 0
-    },
+    }
   },
   methods: {
     handleInputChange(e) {
       let newVal = parseInt(e.target.value, 10)
-      
+
       if (isNaN(newVal)) {
         newVal = null
       }
-      
+
       this.$emit('updated', {
         val: newVal,
         row: this.row,
@@ -70,11 +73,19 @@ div {
   max-width: 40px;
   padding: 1px;
   width: 11vw;
-  
-  &.box-top { border-top: 1px solid #777 }
-  &.box-bottom { border-bottom: 1px solid #777 }
-  &.box-left { border-left: 1px solid #777 }
-  &.box-right { border-right: 1px solid #777 }
+
+  &.box-top {
+    border-top: 1px solid #777;
+  }
+  &.box-bottom {
+    border-bottom: 1px solid #777;
+  }
+  &.box-left {
+    border-left: 1px solid #777;
+  }
+  &.box-right {
+    border-right: 1px solid #777;
+  }
 }
 input {
   border: 1px solid transparent;
@@ -84,7 +95,7 @@ input {
   padding: 0;
   text-align: center;
   width: 100%;
-  
+
   &:focus {
     border-color: dodgerblue;
     outline: none;

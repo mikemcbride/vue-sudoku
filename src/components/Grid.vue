@@ -5,7 +5,8 @@
       :key="index"
       :row="row"
       :row-index="index"
-      @updated="handleCellUpdated" />
+      @updated="handleCellUpdated"
+    />
   </div>
 </template>
 
@@ -14,19 +15,19 @@ import Row from '@/components/Row'
 export default {
   name: 'Grid',
   components: {
-    Row,
+    Row
   },
   props: {
     grid: {
       type: Array,
       required: true
-    },
+    }
   },
   methods: {
     handleCellUpdated(payload) {
       this.$emit('updated', payload)
     }
-  },
+  }
 }
 </script>
 

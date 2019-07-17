@@ -6,7 +6,8 @@
       :row="rowIndex"
       :col="index"
       :cell="cell"
-      @updated="handleCellUpdated" />
+      @updated="handleCellUpdated"
+    />
   </div>
 </template>
 
@@ -26,13 +27,13 @@ export default {
     }
   },
   components: {
-    Cell,
+    Cell
   },
   methods: {
     handleCellUpdated(payload) {
       this.$emit('updated', payload)
     }
-  },
+  }
 }
 </script>
 

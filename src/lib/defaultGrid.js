@@ -1,5 +1,5 @@
-const values = [1,2,3,4,5,6,7,8,9]
-const range = [0,1,2,3,4,5,6,7,8]
+const values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+const range = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 const defaultCell = {
   value: null,
   solved: false,
@@ -8,11 +8,10 @@ const defaultCell = {
 
 function buildRow(index) {
   return range.map(column => ({
-      ...defaultCell,
-      row: index,
-      column
-    })
-  )
+    ...defaultCell,
+    row: index,
+    column
+  }))
 }
 
 function buildGrid() {
