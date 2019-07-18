@@ -101,57 +101,53 @@ export default {
 
       return cells
     },
-
-    async solve() {
-      // in case a second puzzle is being solved, make sure snapshots is empty.
+    resetData() {
+      // reset data
       this.snapshots = []
       this.solveTime = 0
-      this.startTime = Date.now()
+      this.setCalculations(0)
+    },
+    solve() {
+      this.resetData()
 
       if (this.isSolved() === false) {
-        await this.makePass()
+        this.startTime = Date.now()
+        this.makePass()
       }
     },
     loadPuzzle(level) {
       let puzzle = deepClone(puzzles[level].grid)
-      this.SET_GRID(puzzle)
-      this.SET_CALCULATIONS(0)
-      this.solveTime = 0
+      this.setGrid(puzzle)
+      this.resetData()
     },
     clear() {
       let grid = deepClone(defaultGrid)
-      this.SET_GRID(grid)
-      this.SET_CALCULATIONS(0)
-      this.solveTime = 0
+      this.setGrid(grid)
+      this.resetData()
     },
-
-    SET_CELL({ row, col, cell }) {
-      this.grid[row][col] = cell
-    },
-    SET_CELL_VALUE({ row, col, val }) {
+    setCellValue({ row, col, val }) {
       this.grid[row][col].value = val
     },
-    SET_CELL_SOLVED({ row, col, val }) {
+    setCellSolved({ row, col, val }) {
       this.grid[row][col].solved = val
     },
-    ADD_SNAPSHOT(grid) {
+    addSnapshot(grid) {
       this.snapshots = [...this.snapshots, grid]
     },
-    REVERT_SNAPSHOT() {
+    revertSnapshot() {
       const snapshots = deepClone(this.snapshots)
       this.grid = snapshots.pop() // take the latest snapshot
       this.snapshots = snapshots // set the rest to snapshots
     },
-    SET_GRID(grid) {
+    setGrid(grid) {
       this.grid = grid
     },
-    SET_CALCULATIONS(val) {
+    setCalculations(val) {
       this.calculations = val
     },
-    INCREMENT_CALCULATIONS() {
+    incrementCalculations() {
       this.calculations += 1
     },
-
     setCell({ val, row, col }) {
       // this only gets triggered when the user manually updates the value,
       // so we can assume that the cell is solved.
@@ -160,8 +156,7 @@ export default {
         solved: val === null ? false : true,
         possibleValues: val === null ? [...allPossibleCellValues] : []
       }
-
-      this.SET_CELL({ row, col, cell })
+      this.grid[row][col] = cell
     },
     async makePass() {
       let hasUpdatedValues = false
@@ -178,19 +173,19 @@ export default {
           if (cell.solved === false) {
             if (cell.possibleValues.length === 0) {
               // we ran out of options here. We need to revert one more snapshot back before proceeding.
-              this.REVERT_SNAPSHOT()
-              this.INCREMENT_CALCULATIONS()
+              this.revertSnapshot()
+              this.incrementCalculations()
               hasReverted = true
               break outer_loop
             }
 
             let possibleValues = this.getPossibleCellValues(row, col)
-            this.INCREMENT_CALCULATIONS()
+            this.incrementCalculations()
 
             if (possibleValues.length === 0) {
               // no possible values, this attempt is not correct. bail.
-              this.REVERT_SNAPSHOT()
-              this.INCREMENT_CALCULATIONS()
+              this.revertSnapshot()
+              this.incrementCalculations()
               hasReverted = true
               break outer_loop
             }
@@ -201,13 +196,13 @@ export default {
               // revert that knowledge. Only update cell.possibleValues if it benefits us.
               hasUpdatedValues = true
               cell.possibleValues = possibleValues
-              this.INCREMENT_CALCULATIONS()
+              this.incrementCalculations()
             }
 
             if (cell.possibleValues.length === 1) {
               cell.solved = true
               cell.value = cell.possibleValues[0]
-              this.INCREMENT_CALCULATIONS()
+              this.incrementCalculations()
             }
           }
         }
@@ -220,7 +215,7 @@ export default {
           for (let col in this.grid[row]) {
             let cell = this.grid[row][col]
 
-            this.INCREMENT_CALCULATIONS()
+            this.incrementCalculations()
 
             if (cell.solved === false) {
               // grab first item in possible values, and remove it from the array
@@ -230,13 +225,13 @@ export default {
               // this will ensure we don't ever repeat checks but still test all cells properly.
               // also make sure we do a deep copy of the grid, so we don't retain object references
               const snapshot = deepClone(this.grid)
-              this.ADD_SNAPSHOT(snapshot)
-              this.INCREMENT_CALCULATIONS()
+              this.addSnapshot(snapshot)
+              this.incrementCalculations()
 
               // now update our value and solved
-              this.SET_CELL_VALUE({ row, col, val: testVal })
-              this.SET_CELL_SOLVED({ row, col, val: true })
-              this.INCREMENT_CALCULATIONS()
+              this.setCellValue({ row, col, val: testVal })
+              this.setCellSolved({ row, col, val: true })
+              this.incrementCalculations()
 
               break outer_loop
             }
