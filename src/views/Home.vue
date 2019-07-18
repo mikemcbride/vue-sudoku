@@ -103,6 +103,8 @@ export default {
     },
 
     async solve() {
+      // in case a second puzzle is being solved, make sure snapshots is empty.
+      this.snapshots = []
       this.solveTime = 0
       this.startTime = Date.now()
 
@@ -247,6 +249,7 @@ export default {
           this.makePass()
         }, 0)
       } else {
+        this.snapshots = []
         let finish = Date.now() - this.startTime
         this.solveTime = `${finish / 1000}s`
       }
