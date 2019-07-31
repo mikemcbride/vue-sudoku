@@ -2,12 +2,14 @@
   <div class="home">
     <section>
       <div>
+        <h1>Sudoku Solver</h1>
         <Grid :grid="grid" @updated="setCell" />
       </div>
       <p>Calculations required: {{ calculations }}</p>
       <p>Time to solve: {{ solveTime }}</p>
       <button @click="solve">Solve</button>
       <button @click="clear">Clear Puzzle</button>
+      <ImportPuzzle @import="setGrid" />
     </section>
 
     <aside>
@@ -27,6 +29,7 @@ import defaultGrid from '@/lib/defaultGrid'
 import deepClone from '@/lib/deepClone'
 import puzzles from '@/lib/puzzles'
 import Grid from '@/components/Grid'
+import ImportPuzzle from '@/components/ImportPuzzle'
 
 // we will use these arrays to quickly map through all row and column indices
 const range = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -35,7 +38,8 @@ const allPossibleCellValues = range.map(it => it + 1)
 export default {
   name: 'Home',
   components: {
-    Grid
+    Grid,
+    ImportPuzzle
   },
   data() {
     return {
