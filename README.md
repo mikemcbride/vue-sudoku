@@ -39,6 +39,10 @@ Each cell in the grid is an object containing some information about the cell:
 
 There are four puzzles that can be pre-loaded. This is mostly for easier testing during development, but also useful to show the app working.
 
+## Import a Puzzle
+
+You can import a puzzle using a textarea located beneath the puzzle grid. For empty squares, put an `x`. No need for spaces, commas, or line-breaks (but I'll handle those if you put them in).
+
 ## Contributing
 
 If you have enhancements or suggestions I'd love to hear them. Open an issue or cut a PR!
