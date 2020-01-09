@@ -4879,6 +4879,11 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
   integrity sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==
 
+klona@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/klona/-/klona-1.0.0.tgz#cbc230682a105eaf83e1159f678ae97d6f344aa2"
+  integrity sha512-f/1HUwqlnG2vtdMjaeRZhCrDE61tPerNtxP8Q+f7dp90pW/5pvoTaaY98B9lsyGxaAYzrPeh8PQDLq0h/EWYMQ==
+
 launch-editor-middleware@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/launch-editor-middleware/-/launch-editor-middleware-2.2.1.tgz#e14b07e6c7154b0a4b86a0fd345784e45804c157"

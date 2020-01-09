@@ -26,7 +26,7 @@
 
 <script>
 import defaultGrid from '@/lib/defaultGrid'
-import deepClone from '@/lib/deepClone'
+import klona from 'klona'
 import puzzles from '@/lib/puzzles'
 import Grid from '@/components/Grid'
 import ImportPuzzle from '@/components/ImportPuzzle'
@@ -43,7 +43,7 @@ export default {
   },
   data() {
     return {
-      grid: deepClone(defaultGrid),
+      grid: klona(defaultGrid),
       calculations: 0,
       snapshots: [],
       solveTime: 0,
@@ -120,12 +120,12 @@ export default {
       }
     },
     loadPuzzle(level) {
-      let puzzle = deepClone(puzzles[level].grid)
+      let puzzle = klona(puzzles[level].grid)
       this.setGrid(puzzle)
       this.resetData()
     },
     clear() {
-      let grid = deepClone(defaultGrid)
+      let grid = klona(defaultGrid)
       this.setGrid(grid)
       this.resetData()
     },
@@ -139,7 +139,7 @@ export default {
       this.snapshots = [...this.snapshots, grid]
     },
     revertSnapshot() {
-      const snapshots = deepClone(this.snapshots)
+      const snapshots = klona(this.snapshots)
       this.grid = snapshots.pop() // take the latest snapshot
       this.snapshots = snapshots // set the rest to snapshots
     },
@@ -228,7 +228,7 @@ export default {
               // take a snapshot NOW, so before we update the cell but after we've removed one possible value.
               // this will ensure we don't ever repeat checks but still test all cells properly.
               // also make sure we do a deep copy of the grid, so we don't retain object references
-              const snapshot = deepClone(this.grid)
+              const snapshot = klona(this.grid)
               this.addSnapshot(snapshot)
               this.incrementCalculations()
 
