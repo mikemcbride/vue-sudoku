@@ -41,7 +41,51 @@ There are four puzzles that can be pre-loaded. This is mostly for easier testing
 
 ## Import a Puzzle
 
-You can import a puzzle using a textarea located beneath the puzzle grid. For empty squares, put an `x`. No need for spaces, commas, or line-breaks (but I'll handle those if you put them in).
+You can import a puzzle using a textarea located beneath the puzzle grid. This app supports two formats for loading puzzles: Sudoku Puzzle format and Simple Sudoku format. See [this page](http://www.sudocue.net/fileformats.php) for more info on Sudoku file formats.
+
+### Example Sudoku Puzzle file
+
+```
+2..1.5..3
+.54...71.
+.1.2.3.8.
+6.28.73.4
+.........
+1.53.98.6
+.2.7.1.6.
+.81...24.
+7..4.2..1
+```
+
+### Example Simple Sudoku file
+
+```
+1..|...|7..
+.2.|...|5..
+6..|38.|...
+-----------
+.78|...|...
+...|6.9|...
+...|...|14.
+-----------
+...|.25|..9
+..3|...|.6.
+..4|...|..2
+```
+
+There is also an older format of Simple Sudoku files, which this app can also parse (you can use uppercase or lowercase `x`):
+
+```
+X6X1X4X5X
+XX83X56XX
+2XXXXXXX1
+8XX4X7XX6
+XX6XXX3XX
+7XX9X1XX4
+5XXXXXXX2
+XX72X69XX
+X4X5X8X7X
+```
 
 ## Contributing
 

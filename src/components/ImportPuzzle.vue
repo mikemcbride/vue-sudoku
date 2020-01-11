@@ -17,27 +17,32 @@ export default {
     }
   },
   methods: {
+    isEmptyCellCharacter(char) {
+      return char.toLowerCase() === 'x' || char === '.'
+    },
     importPuzzle() {
       let puzzlePieces = this.puzzle.split('').filter(it => {
-        // only allow x or numbers 1-9
-        if (it.toLowerCase() === 'x') {
+        // only allow x, period, or numbers 1-9
+        if (this.isEmptyCellCharacter(it)) {
           return true
         }
         
         let num = parseInt(it, 10)
-        if (0 < num < 10) {
-          return true
-        }
         
-        return false
+        if (isNaN(num)) {
+          return false
+        }
+
+        return 0 < num < 10
       })
+
       if (puzzlePieces.length !== 81) {
         this.showError = true
         this.errorMessage = 'Import data must have 81 cells containing numbers or x for empty cells.'
       } else {
         let grid = puzzlePieces
           .map(it => {
-            if (it.toLowerCase() === 'x') {
+            if (this.isEmptyCellCharacter(it)) {
               return {
                 value: null,
                 solved: false,
