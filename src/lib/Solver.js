@@ -1,4 +1,5 @@
 import klona from 'klona'
+import uniqBy from 'uniq-by'
 
 // we will use these arrays to quickly map through all row and column indices
 const range = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -8,7 +9,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 export default class Solver {
   constructor(grid = []) {
-    this.grid = klona(grid)
+    this.grid = grid
     this.calculations = 0
     this.snapshots = []
     this.startTime = 0
@@ -34,34 +35,13 @@ export default class Solver {
   }
 
   get isSolved() {
-    for (let row of this.grid) {
-      const unsolvedCells = row.filter(cell => cell.solved !== true)
-      if (unsolvedCells.length > 0) {
-        // we have unsolved cells in this row
-        return false
-      }
-    }
-    // we made it to the end and all cells are solved
-    return true
+    return this.getFlattenedGrid().every(cell => cell.solved === true)
   }
 
   getPossibleCellValues(row, col) {
-    // get an array of values for each cell in the current row, column, and square
-    const rowVals = this.getCellsInRow(row)
-      .filter(it => it.solved)
-      .map(it => it.value)
-    const columnVals = this.getCellsInColumn(col)
-      .filter(it => it.solved)
-      .map(it => it.value)
-    const squareVals = this.getCellsInSquare(row, col)
-      .filter(it => it.solved)
-      .map(it => it.value)
-
-    // make a unique list of the above values
-    const allVals = new Set([...rowVals, ...columnVals, ...squareVals])
-
+    const allVals = new Set(this.getRelatedSolvedCells(row, col).map(it => it.value))
     // return a filtered list that excludes the solved values from the set above
-    return allPossibleCellValues.filter(it => allVals.has(it) === false)
+    return allPossibleCellValues.filter(it => !allVals.has(it))
   }
 
   getCellsInRow(row) {
@@ -76,16 +56,35 @@ export default class Solver {
     let cells = []
     // Math FTW! row - row % 3 will give us the starting index of the current box,
     // so we can get the rows of this box by adding 0, 1, and 2 to that value.
-    let rows = [0, 1, 2].map(r => r + (row - (row % 3)))
-    let cols = [0, 1, 2].map(c => c + (col - (col % 3)))
+    const startRow = row - (row % 3)
+    const startCol = col - (col % 3)
+    let rows = [0, 1, 2].map(r => r + startRow)
+    let cols = [0, 1, 2].map(c => c + startCol)
 
-    rows.forEach(row => {
-      cols.forEach(column => {
+    for (let row of rows) {
+      for (let column of cols) {
         cells.push(this.grid[row][column])
-      })
-    })
+      }
+    }
 
     return cells
+  }
+
+  getRelatedCells(row, col) {
+    const thisCellId = `${row}.${col}`
+    return uniqBy([
+      ...this.getCellsInColumn(col),
+      ...this.getCellsInRow(row),
+      ...this.getCellsInSquare(row, col)
+    ], 'id').filter(it => it.id !== thisCellId)
+  }
+
+  getRelatedUnsolvedCells(row, col) {
+    return this.getRelatedCells(row, col).filter(it => !it.solved)
+  }
+
+  getRelatedSolvedCells(row, col) {
+    return this.getRelatedCells(row, col).filter(it => it.solved === true)
   }
 
   setCell({ val, row, col }) {
@@ -94,17 +93,12 @@ export default class Solver {
     const cell = {
       value: val,
       solved: val === null ? false : true,
-      possibleValues: val === null ? [...allPossibleCellValues] : []
+      possibleValues: val === null ? [...allPossibleCellValues] : [],
+      row: row, 
+      column: col,
+      id: `${row}.${col}`
     }
     this.grid[row][col] = cell
-  }
-
-  setCellValue({ row, col, val }) {
-    this.grid[row][col].value = val
-  }
-
-  setCellSolved({ row, col, val }) {
-    this.grid[row][col].solved = val
   }
 
   addSnapshot(grid) {
@@ -112,58 +106,42 @@ export default class Solver {
   }
 
   revertSnapshot() {
-    const snapshots = klona(this.snapshots)
-    this.grid = snapshots.pop() // take the latest snapshot
-    this.snapshots = snapshots // set the rest to snapshots
+    this.grid = this.snapshots.pop() // take the latest snapshot
   }
 
   incrementCalculations() {
     this.calculations += 1
   }
 
-  setDetoursForSolvedCell({ row, column, value }) {
-    const unsolved = [
-      ...this.getCellsInColumn(column),
-      ...this.getCellsInRow(row),
-      ...this.getCellsInSquare(row, column)
-    ].filter(it => !it.solved)
-    
-    unsolved.forEach(it => {
-      const id = `${it.row}.${it.column}`
-      const detour = {
-        row: it.row,
-        column: it.column,
-        id: id
-      }
+  setDetoursForSolvedCell({ row, column }) {
+    const unsolved = this.getRelatedUnsolvedCells(row, column)
 
-      const isInDetours = this.detours.some(it => it.id === id)
+    for (let cell of unsolved) {
+      const isInDetours = this.detours.some(it => it.id === cell.id)
 
       // we know the value of the solved cell, so update this cell's possible values to remove it.
-      const remoteCell = this.grid[it.row][it.column]
-      remoteCell.possibleValues = remoteCell.possibleValues.filter(val => val !== value)
+      cell.possibleValues = this.getPossibleCellValues(cell.row, cell.column)
 
-      if (remoteCell.possibleValues.length === 1) {
+      if (cell.possibleValues.length === 1) {
         // we just solved another cell. set it to solved and don't add to our detours array.
-        remoteCell.value = remoteCell.possibleValues[0]
-        remoteCell.solved = true
+        cell.value = cell.possibleValues[0]
+        cell.solved = true
 
         if (isInDetours) {
           // this cell was already in detours, but we just solved it. remove it.
-          this.detours = this.detours.filter(d => d.id !== id)
+          this.detours = this.detours.filter(d => d.id !== cell.id)
         }
-        this.setDetoursForSolvedCell(remoteCell)
+        this.setDetoursForSolvedCell(cell)
       } else if (!isInDetours) {
         // this item isn't in our array yet. add it
-        this.detours.push(detour)
+        this.detours.push(cell)
       }
-    })
+    }
   }
 
   getFlattenedGrid() {
     // returns a flattened array for enabling single-pass loop through all grid cells
-    return this.grid.reduce((acc, row) => {
-      return [...acc, ...row]
-    }, [])
+    return this.grid.reduce((acc, row) => acc.concat(row), [])
   }
 
   makePass() {
@@ -273,8 +251,8 @@ export default class Solver {
           this.incrementCalculations()
 
           // now update our value and solved
-          this.setCellValue({ row, col, val: testVal })
-          this.setCellSolved({ row, col, val: true })
+          cell.value = testVal
+          cell.solved = true
           this.incrementCalculations()
 
           break
