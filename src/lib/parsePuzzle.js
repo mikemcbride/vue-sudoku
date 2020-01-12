@@ -45,9 +45,11 @@ export default function (puzzle) {
         val.row = row
         if (acc[row]) {
           val.column = acc[row].length
+          val.id = `${val.row}.${val.column}`
           acc[row].push(val)
         } else {
           val.column = 0
+          val.id = `${val.row}.${val.column}`
           acc[row] = [val]
         }
 

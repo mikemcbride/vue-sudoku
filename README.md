@@ -6,7 +6,9 @@ Brute force search algorithms take a relatively dumb approach. By that I mean th
 
 ## The Approach
 
-The approach in this project differs slightly from a normal brute force search in that we will work our way through each cell on the board and check how many possible values are safe to play in the current cell as we iterate, which is more like what a human does when it plays sudoku. When only one possible value remains for a cell, we set it. Each time we iterate through the cells, we re-calculate the possible cell values. We do this until we have made a pass through the entire board and not eliminated any possible values. At this point, we take a snapshot of the current board (so we can backtrack) and we move through the cells until we find the first cell without a set value. We then look at its list of possible values, start with the first possible value, and continue solving the puzzle assuming that is the right value. We do this until we complete the puzzle or are unable to solve any more cells. Once we can no longer solve cells, we backtrack our checkpoint and choose the next possible value in the first unsolved cell, and repeat this process until all cells are solved. The key distinction here is that rather than blindly setting each value, we only set the values of a cell when we have eliminated all other possible values, or are unable to proceed without guessing. In theory this should be faster than a normal BFS.
+The approach in this project differs slightly from a normal brute force search in that we will work our way through each cell on the board and check how many possible values are safe to play in the current cell as we iterate, which is more like what a human does when it plays sudoku. When only one possible value remains for a cell, we set it. When we solve a cell, we then make what I call a "detour" and check any cells in the same row, column, or square and eliminate the newly solved value from their possible values. If eliminating a value during this detour solves one of these cells, we take another detour off of that. Again, this part of the algorithm mimics the way humans attempt to solve these puzzles.
+
+Each time we iterate through the cells, we re-calculate the possible cell values. We do this until we have made a pass through the entire board and not eliminated any possible values. At this point, we take a snapshot of the current board (so we can backtrack) and we move through the cells until we find the first cell without a set value. We then look at its list of possible values, start with the first possible value, and continue solving the puzzle assuming that this is the right value. We do this until we complete the puzzle or are unable to solve any more cells. Once we can no longer solve cells, we backtrack to our checkpoint and choose the next possible value in the first unsolved cell, and repeat this process until all cells are solved. The key distinction here is that rather than guessing each value immediately, we set the value of a cell when we have eliminated all other possible values using our logic before we proceed to guessing. In theory this should be significantly faster than a normal BFS.
 
 ## Data Structure
 
@@ -34,6 +36,32 @@ Each cell in the grid is an object containing some information about the cell:
 - possible remaining values (an array of integers)
 - a flag on whether or not it is solved
 - the column and row where it resides
+
+Some example cell values:
+
+```js
+{
+  value: null,
+  possibleValues: [1,2,3,4,5],
+  solved: false,
+  column: 1,
+  row: 5
+},
+{
+  value: 2,
+  possibleValues: [2],
+  solved: true,
+  column: 6,
+  row: 3
+}
+```
+
+Inside our `Solver` class, we keep track of a few other things in addition to this `grid` structure:
+
+- The number of calculations (an integer)
+- The `snapshots`, for backtracking (an Array)
+- The `detours` (an Array)
+- The start time and finish time (instances of `Date.now()`), which we use to display total time to solve the puzzle
 
 ## Puzzle Data for Development
 
