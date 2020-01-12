@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import parsePuzzle from '@/lib/parsePuzzle'
+
 export default {
   name: 'ImportPuzzle',
   data() {
@@ -17,60 +19,13 @@ export default {
     }
   },
   methods: {
-    isEmptyCellCharacter(char) {
-      return char.toLowerCase() === 'x' || char === '.'
-    },
     importPuzzle() {
-      let puzzlePieces = this.puzzle.split('').filter(it => {
-        // only allow x, period, or numbers 1-9
-        if (this.isEmptyCellCharacter(it)) {
-          return true
-        }
-        
-        let num = parseInt(it, 10)
-        
-        if (isNaN(num)) {
-          return false
-        }
-
-        return 0 < num < 10
-      })
-
-      if (puzzlePieces.length !== 81) {
+      const result = parsePuzzle(this.puzzle)
+      if (result.error) {
         this.showError = true
-        this.errorMessage = 'Import data must have 81 cells containing numbers or x for empty cells.'
+        this.errorMessage = result.message
       } else {
-        let grid = puzzlePieces
-          .map(it => {
-            if (this.isEmptyCellCharacter(it)) {
-              return {
-                value: null,
-                solved: false,
-                possibleValues: [1,2,3,4,5,6,7,8,9]
-              }
-            } else {
-              return {
-                value: parseInt(it, 10),
-                solved: true,
-                possibleValues: []
-              }
-            }
-          })
-          .reduce((acc, val, idx) => {
-            let row = Math.floor(idx/9)
-            val.row = row
-            if (acc[row]) {
-              val.column = acc[row].length
-              acc[row].push(val)
-            } else {
-              val.column = 0
-              acc[row] = [val]
-            }
-            
-            return acc
-          }, [])
-        
-        this.$emit('import', grid)
+        this.$emit('import', result)
       }
     }
   },

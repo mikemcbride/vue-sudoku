@@ -26,8 +26,8 @@
 
 <script>
 import defaultGrid from '@/lib/defaultGrid'
-import klona from 'klona'
 import puzzles from '@/lib/puzzles'
+import parsePuzzle from '@/lib/parsePuzzle'
 import Solver from '@/lib/Solver'
 import Grid from '@/components/Grid'
 import ImportPuzzle from '@/components/ImportPuzzle'
@@ -53,7 +53,7 @@ export default {
       this.puzzle.solve()
     },
     loadPuzzle(level) {
-      let puzzle = klona(puzzles[level])
+      let puzzle = parsePuzzle(puzzles[level])
       this.puzzle = new Solver(puzzle)
     },
     setPuzzle(puzzle) {
