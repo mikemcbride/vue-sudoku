@@ -121,11 +121,13 @@ export default class Solver {
 
       // we know the value of the solved cell, so update this cell's possible values to remove it.
       cell.possibleValues = this.getPossibleCellValues(cell.row, cell.column)
+      this.incrementCalculations()
 
       if (cell.possibleValues.length === 1) {
         // we just solved another cell. set it to solved and don't add to our detours array.
         cell.value = cell.possibleValues[0]
         cell.solved = true
+        this.incrementCalculations()
 
         if (isInDetours) {
           // this cell was already in detours, but we just solved it. remove it.
