@@ -190,11 +190,8 @@ export default class Solver {
           cell.value = cell.possibleValues[0]
           this.incrementCalculations()
           this.setDetoursForSolvedCell(cell)
-        }
-      }
-    }
 
-    // I tried running this immediately after solving a cell and also running it after a full pass through the board.
+// I tried running this immediately after solving a cell and also running it after a full pass through the board.
     // There were trade-offs both ways, but the time to solve didn't vary much, and this approach actually resulted
     // in fewer required calculations to solve the simpler puzzles than running immediately after solving a cell.
     while (this.detours.length > 0) {
@@ -227,6 +224,10 @@ export default class Solver {
           cell.value = cell.possibleValues[0]
           this.incrementCalculations()
           this.setDetoursForSolvedCell(cell)
+        }
+      }
+    }
+
         }
       }
     }
