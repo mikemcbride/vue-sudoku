@@ -120,6 +120,12 @@ XX72X69XX
 X4X5X8X7X
 ```
 
+## References
+
+- [This article](http://norvig.com/sudoku.html) was highly influential in some of the later rounds of performance improvements.
+- [Dr. Arto Inkala](http://www.aisudoku.com/index_en.html) has used mathematics to create some of the most difficult puzzles in the world. I used many of his puzzles in my testing, especially for profiling performance improvements.
+
+
 ## Contributing
 
 If you have enhancements or suggestions I'd love to hear them. Open an issue or cut a PR!
