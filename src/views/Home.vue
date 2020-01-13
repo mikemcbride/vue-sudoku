@@ -18,8 +18,13 @@
       <button @click="loadPuzzle('medium')">Medium Puzzle</button>
       <button @click="loadPuzzle('hard')">Hard Puzzle</button>
       <button @click="loadPuzzle('evil')">Evil Puzzle</button>
-      <button @click="loadPuzzle('hardest')">World's Hardest Sudoku</button>
-      <a href="https://www.conceptispuzzles.com/index.aspx?uri=info/article/424" target="_blank">Worlds Hardest Sudoku according to this article</a>
+      <section>
+        Try one of <a href="http://www.aisudoku.com/index_en.html" target="_blank" rel="noreferrer noopener nofollow">Dr. Arto Inkala's</a> top 10 most difficult puzzles:
+
+        <div class="insane">
+          <button v-for="(p, i) in 10" :key="p" @click="loadInsanePuzzle(i)">{{ p }}</button>
+        </div>
+      </section>
     </aside>
   </div>
 </template>
@@ -55,6 +60,10 @@ export default {
     loadPuzzle(level) {
       let puzzle = parsePuzzle(puzzles[level])
       this.puzzle = new Solver(puzzle)
+    },
+    loadInsanePuzzle(level) {
+      let p = parsePuzzle(puzzles.insane[level])
+      this.puzzle = new Solver(p)
     },
     setPuzzle(puzzle) {
       this.puzzle = new Solver(puzzle)
@@ -132,5 +141,18 @@ a {
 
 section {
   margin-bottom: 4rem;
+}
+
+.insane {
+  padding-top: 1rem;
+  button {
+    color: dodgerblue;
+    display: inline-block;
+    padding: 0 2px;
+    margin: 0 2px;
+    cursor: pointer;
+    width: auto;
+    background: #fff;
+  }
 }
 </style>

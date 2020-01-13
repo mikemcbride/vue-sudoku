@@ -18,11 +18,14 @@ export default class Solver {
   }
 
   start() {
+    this.snapshots = []
+    this.detours = []
     this.startTime = Date.now()
   }
 
   done() {
     this.snapshots = []
+    this.detours = []
     this.finishTime = Date.now()
   }
 
@@ -85,6 +88,22 @@ export default class Solver {
 
   getRelatedSolvedCells(row, col) {
     return this.getRelatedCells(row, col).filter(it => it.solved === true)
+  }
+
+  getAllUnsolvedCells() {
+    return this.getFlattenedGrid().filter(it => it.solved === false)
+  }
+
+  getOptimalGuessCell() {
+    // we try to find the unsolved cell with the fewest possible values remaining
+    return this.getAllUnsolvedCells().reduce((best, current, i, arr) => {
+      if (current.length === 2) {
+        // we won't find a value lower than 2, eject early
+        arr.splice(i)
+        return current
+      }
+      return current.possibleValues.length < best.possibleValues.length ? current : best
+    }, { possibleValues: { length: Infinity }})
   }
 
   setCell({ val, row, col }) {
@@ -233,33 +252,32 @@ export default class Solver {
       }
     }
 
-    if (hasUpdatedValues === false && hasReverted === false) {
+    if (hasUpdatedValues === false && hasReverted === false && !this.isSolved) {
       // we made it through without updating anything, start making assumptions.
-      // find the first unsolved cell, try the first possible value, and take a snapshot.
-      for (let cell of cells) {
-        this.incrementCalculations()
+      // find the most optimal unsolved cell to guess, try the first value, and take a snapshot.
+      const cell = this.getOptimalGuessCell()
+      // console.log(`optimal guess cell is ${cell.id} with values ${cell.possibleValues.join(', ')}`)
+      this.incrementCalculations()
 
-        if (cell.solved === false) {
-          const row = cell.row
-          const col = cell.column
-          // grab first item in possible values, and remove it from the array
-          let testVal = cell.possibleValues.shift()
-
-          // take a snapshot NOW, so before we update the cell but after we've removed one possible value.
-          // this will ensure we don't ever repeat checks but still test all cells properly.
-          // also make sure we do a deep copy of the grid, so we don't retain object references
-          const snapshot = klona(this.grid)
-          this.addSnapshot(snapshot)
-          this.incrementCalculations()
-
-          // now update our value and solved
-          cell.value = testVal
-          cell.solved = true
-          this.incrementCalculations()
-
-          break
-        }
+      // grab first item in possible values, and remove it from the array
+      let testVal
+      if (cell.possibleValues) {
+        testVal = cell.possibleValues.shift()
+      } else {
+        // console.log('cell:', cell)
       }
+
+      // take a snapshot NOW, so before we update the cell but after we've removed one possible value.
+      // this will ensure we don't ever repeat checks but still test all cells properly.
+      // also make sure we do a deep copy of the grid, so we don't retain object references
+      const snapshot = klona(this.grid)
+      this.addSnapshot(snapshot)
+      this.incrementCalculations()
+
+      // now update our value and solved
+      cell.value = testVal
+      cell.solved = true
+      this.incrementCalculations()
     }
   }
 
