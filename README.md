@@ -8,7 +8,9 @@ Brute force search algorithms take a relatively dumb approach. By that I mean th
 
 The approach in this project differs slightly from a normal brute force search in that we will work our way through each cell on the board and check how many possible values are safe to play in the current cell as we iterate, which is more like what a human does when it plays sudoku. When only one possible value remains for a cell, we set it. When we solve a cell, we then make what I call a "detour" and check any cells in the same row, column, or square and eliminate the newly solved value from their possible values. If eliminating a value during this detour solves one of these cells, we take another detour off of that. Again, this part of the algorithm mimics the way humans attempt to solve these puzzles.
 
-Each time we iterate through the cells, we re-calculate the possible cell values. We do this until we have made a pass through the entire board and not eliminated any possible values. At this point, we take a snapshot of the current board (so we can backtrack) and we move through the cells until we find the first cell without a set value. We then look at its list of possible values, start with the first possible value, and continue solving the puzzle assuming that this is the right value. We do this until we complete the puzzle or are unable to solve any more cells. Once we can no longer solve cells, we backtrack to our checkpoint and choose the next possible value in the first unsolved cell, and repeat this process until all cells are solved. The key distinction here is that rather than guessing each value immediately, we set the value of a cell when we have eliminated all other possible values using our logic before we proceed to guessing. In theory this should be significantly faster than a normal BFS.
+Each time we iterate through the cells, we re-calculate the possible cell values. We do this until we have made a pass through the entire board and not eliminated any possible values. At this point, we take a snapshot of the current board (so we can backtrack) and we move through the cells until we find the first cell without a set value. We then look at its list of possible values, start with the first possible value, and continue solving the puzzle assuming that this is the right value. We do this until we complete the puzzle or are unable to solve any more cells.
+
+Once we can no longer solve cells, we backtrack to our checkpoint and start guessing. This is another place where the algorithm differs from normal BFS. Rather than starting at the first unsolved cell and guessing the first value in the list of possible values, I search the board for unsolved cells and find the one with the fewest possible remaining values. The thought behind this is that if we had a cell with 7 possible values remaining, we have a 6/7 chance that our guess is wrong, potentially leading to many attempts and backtracks. Instead, if we find an unsolved cell with only 2 or 3 remaining possible values, our chances are significantly greater that we'll be correct the first time and waste fewer cycles backtracking. Once we determine which cell to start guessing on, we choose the next possible value in the list of possible values, and repeat this process until all cells are solved. The major distinction here, I think, is that rather than guessing each value immediately (normal BFS approach), we set the value of a cell only when we have eliminated all other possible values using our logic before we proceed to guessing. This should eliminate a significant number of incorrect guesses up front and in theory should result in significantly faster solve times than a normal BFS.
 
 ## Data Structure
 
@@ -36,6 +38,7 @@ Each cell in the grid is an object containing some information about the cell:
 - possible remaining values (an array of integers)
 - a flag on whether or not it is solved
 - the column and row where it resides
+- an id that concatenates the row and column for faster find/filter (this is purely for array performance optimization)
 
 Some example cell values:
 
@@ -44,15 +47,17 @@ Some example cell values:
   value: null,
   possibleValues: [1,2,3,4,5],
   solved: false,
+  row: 5,
   column: 1,
-  row: 5
+  id: `5.1`
 },
 {
   value: 2,
   possibleValues: [2],
   solved: true,
+  row: 3,
   column: 6,
-  row: 3
+  id: `3.6`
 }
 ```
 
@@ -65,7 +70,7 @@ Inside our `Solver` class, we keep track of a few other things in addition to th
 
 ## Puzzle Data for Development
 
-There are four puzzles that can be pre-loaded. This is mostly for easier testing during development, but also useful to show the app working.
+There are four puzzles that can be pre-loaded. This is mostly for easier testing during development, but also useful to show the app working. For additional puzzles, check out the list in [puzzles.md](./puzzles.md) of [Dr. Arto Inkala's top 10 hardest sudoku](http://www.aisudoku.com/index_en.html).
 
 ## Import a Puzzle
 
