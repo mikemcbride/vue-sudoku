@@ -1,9 +1,14 @@
 import klona from 'klona'
 import uniqBy from 'uniq-by'
+import filterMutate from '@arr/filter.mutate'
+import filter from '@arr/filter'
+import flatten from '@arr/flatten'
+import map from '@arr/map'
+import some from '@arr/some'
 
 // we will use these arrays to quickly map through all row and column indices
 const range = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-const allPossibleCellValues = range.map(it => it + 1)
+const allPossibleCellValues = map(range, it => it + 1)
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -15,6 +20,7 @@ export default class Solver {
     this.startTime = 0
     this.finishTime = 0
     this.detours = []
+    this.solvedCells = new Set()
   }
 
   start() {
@@ -38,21 +44,21 @@ export default class Solver {
   }
 
   get isSolved() {
-    return this.getFlattenedGrid().every(cell => cell.solved === true)
+    return [...this.solvedCells].length === 81
   }
 
   getPossibleCellValues(row, col) {
-    const allVals = new Set(this.getRelatedSolvedCells(row, col).map(it => it.value))
+    const allVals = new Set(map(this.getRelatedSolvedCells(row, col), it => it.value))
     // return a filtered list that excludes the solved values from the set above
-    return allPossibleCellValues.filter(it => !allVals.has(it))
+    return filter(allPossibleCellValues, it => !allVals.has(it))
   }
 
   getCellsInRow(row) {
-    return range.map(col => this.grid[row][col])
+    return map(range, col => this.grid[row][col])
   }
 
   getCellsInColumn(col) {
-    return range.map(row => this.grid[row][col])
+    return map(range, row => this.grid[row][col])
   }
 
   getCellsInSquare(row, col) {
@@ -61,8 +67,8 @@ export default class Solver {
     // so we can get the rows of this box by adding 0, 1, and 2 to that value.
     const startRow = row - (row % 3)
     const startCol = col - (col % 3)
-    let rows = [0, 1, 2].map(r => r + startRow)
-    let cols = [0, 1, 2].map(c => c + startCol)
+    let rows = map([0, 1, 2], r => r + startRow)
+    let cols = map([0, 1, 2], c => c + startCol)
 
     for (let row of rows) {
       for (let column of cols) {
@@ -75,35 +81,44 @@ export default class Solver {
 
   getRelatedCells(row, col) {
     const thisCellId = `${row}.${col}`
-    return uniqBy([
+    const uniqById = uniqBy([
       ...this.getCellsInColumn(col),
       ...this.getCellsInRow(row),
       ...this.getCellsInSquare(row, col)
-    ], 'id').filter(it => it.id !== thisCellId)
+    ], 'id')
+    return filter(uniqById, it => it.id !== thisCellId)
   }
 
   getRelatedUnsolvedCells(row, col) {
-    return this.getRelatedCells(row, col).filter(it => !it.solved)
+    return filter(this.getRelatedCells(row, col), it => !it.solved)
   }
 
   getRelatedSolvedCells(row, col) {
-    return this.getRelatedCells(row, col).filter(it => it.solved === true)
+    return filter(this.getRelatedCells(row, col), it => it.solved === true)
   }
 
   getAllUnsolvedCells() {
-    return this.getFlattenedGrid().filter(it => it.solved === false)
+    return filter(this.getFlattenedGrid(), it => it.solved === false)
   }
 
   getOptimalGuessCell() {
     // we try to find the unsolved cell with the fewest possible values remaining
-    return this.getAllUnsolvedCells().reduce((best, current, i, arr) => {
-      if (current.length === 2) {
-        // we won't find a value lower than 2, eject early
-        arr.splice(i)
-        return current
+    let curPossibilities = Infinity
+    let optimalCell
+    let cells = this.getAllUnsolvedCells()
+    for (let cell of cells) {
+      if (cell.possibleValues.length < curPossibilities) {
+        optimalCell = cell
+        curPossibilities = cell.possibleValues.length
       }
-      return current.possibleValues.length < best.possibleValues.length ? current : best
-    }, { possibleValues: { length: Infinity }})
+
+      // we won't find a value lower than 2, eject early
+      if (curPossibilities === 2) {
+        return optimalCell
+      }
+    }
+
+    return optimalCell
   }
 
   setCell({ val, row, col }) {
@@ -121,11 +136,18 @@ export default class Solver {
   }
 
   addSnapshot(grid) {
-    this.snapshots = [...this.snapshots, grid]
+    this.snapshots.push(grid)
   }
 
   revertSnapshot() {
     this.grid = this.snapshots.pop() // take the latest snapshot
+    this.solvedCells = new Set()
+    let flatGrid = this.getFlattenedGrid()
+    for (let cell of flatGrid) {
+      if (cell.solved === true) {
+        this.solvedCells.add(cell.id)
+      }
+    }
   }
 
   incrementCalculations() {
@@ -136,7 +158,7 @@ export default class Solver {
     const unsolved = this.getRelatedUnsolvedCells(row, column)
 
     for (let cell of unsolved) {
-      const isInDetours = this.detours.some(it => it.id === cell.id)
+      const isInDetours = some(this.detours, (it => it.id === cell.id))
 
       // we know the value of the solved cell, so update this cell's possible values to remove it.
       cell.possibleValues = this.getPossibleCellValues(cell.row, cell.column)
@@ -146,11 +168,12 @@ export default class Solver {
         // we just solved another cell. set it to solved and don't add to our detours array.
         cell.value = cell.possibleValues[0]
         cell.solved = true
+        this.solvedCells.add(cell.id)
         this.incrementCalculations()
 
         if (isInDetours) {
           // this cell was already in detours, but we just solved it. remove it.
-          this.detours = this.detours.filter(d => d.id !== cell.id)
+          filterMutate(this.detours, d => d.id !== cell.id)
         }
         this.setDetoursForSolvedCell(cell)
       } else if (!isInDetours) {
@@ -162,7 +185,7 @@ export default class Solver {
 
   getFlattenedGrid() {
     // returns a flattened array for enabling single-pass loop through all grid cells
-    return this.grid.reduce((acc, row) => acc.concat(row), [])
+    return flatten(this.grid)
   }
 
   makePass() {
@@ -208,6 +231,7 @@ export default class Solver {
 
         if (cell.possibleValues.length === 1) {
           cell.solved = true
+          this.solvedCells.add(cell.id)
           cell.value = cell.possibleValues[0]
           this.incrementCalculations()
           this.setDetoursForSolvedCell(cell)
@@ -245,6 +269,7 @@ export default class Solver {
 
         if (cell.possibleValues.length === 1) {
           cell.solved = true
+          this.solvedCells.add(cell.id)
           cell.value = cell.possibleValues[0]
           this.incrementCalculations()
           this.setDetoursForSolvedCell(cell)
@@ -277,6 +302,7 @@ export default class Solver {
       // now update our value and solved
       cell.value = testVal
       cell.solved = true
+      this.solvedCells.add(cell.id)
       this.incrementCalculations()
     }
   }

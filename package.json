@@ -13,6 +13,12 @@
     "now-build": "vue-cli-service build --modern"
   },
   "dependencies": {
+    "@arr/every": "^1.0.1",
+    "@arr/filter": "^1.0.2",
+    "@arr/filter.mutate": "^1.0.2",
+    "@arr/flatten": "^1.0.1",
+    "@arr/map": "^1.0.1",
+    "@arr/some": "^1.0.1",
     "core-js": "^3.4.4",
     "klona": "^1.0.0",
     "uniq-by": "^1.0.1",

@@ -2,6 +2,36 @@
 # yarn lockfile v1
 
 
+"@arr/every@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@arr/every/-/every-1.0.1.tgz#22fe1f8e6355beca6c7c7bde965eb15cf994387b"
+  integrity sha512-UQFQ6SgyJ6LX42W8rHCs8KVc0JS0tzVL9ct4XYedJukskYVWTo49tNiMEK9C2HTyarbNiT/RVIRSY82vH+6sTg==
+
+"@arr/filter.mutate@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@arr/filter.mutate/-/filter.mutate-1.0.2.tgz#e9f88e30b8291fcf573b06afc3df5990479de92a"
+  integrity sha512-pvpQw5LgZHb6pYcnQ6BUePcYEcfgyK2/hbM1TihBjrOQJ8j8/H4XUri8YWHQbREX8woN4ndtw6Xt0I9QJF9wRA==
+
+"@arr/filter@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@arr/filter/-/filter-1.0.2.tgz#25f3a63efa3aaa97ea0a614134d8c97c643b2770"
+  integrity sha512-vuF1Q6XbBzzKA4K5bwC8bYRfiVfSuNRXYiS6aFEeqWiLvZgr7qiGM5Fi01ql+0fYDON97vbrIqgxTXVCj6E6hg==
+
+"@arr/flatten@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@arr/flatten/-/flatten-1.0.1.tgz#66dfbc029a7a07e624e220f37de7aa279dbe3db3"
+  integrity sha512-elW/c6n0C03bshKz7QEy658r9ls6nKlVDBgl2nlA4a/T1mymvbAmU/leHvL27fhT6fz7RS2XiUwnvvcosdL63w==
+
+"@arr/map@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@arr/map/-/map-1.0.1.tgz#32e7123dcee03a9a4f49a79a7247425e78431050"
+  integrity sha512-broVtcyIvNgPMc97zeb+ogwf231A5CJwzzmdzZSvMwHhrbK2kLmqP3hI1cVeooNfwkzN/QX+nH4gKzqfYj6igQ==
+
+"@arr/some@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@arr/some/-/some-1.0.1.tgz#492152a953e10b413a6387ff84db6731ef1e2a6b"
+  integrity sha512-AGkQ4EJ3GyqVwCMia8cHDygS5yzS/Gxv3ptxy5fMkQ+ACVpiNNy3lNAEZEfiXGFmRXL0EZZENmC/QTy2XBhOFQ==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.5.5":
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.5.5.tgz#bc0782f6d69f7b7d49531219699b988f669a8f9d"
