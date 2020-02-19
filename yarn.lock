@@ -7735,11 +7735,6 @@ union-value@^1.0.0:
     is-extendable "^0.1.1"
     set-value "^2.0.1"
 
-uniq-by@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/uniq-by/-/uniq-by-1.0.1.tgz#7ef1a75a3e7c6e243d6b08a5e8893853ed33ca5e"
-  integrity sha512-TibXanEOkk+AUo2iqAc8uknfhbinaBonEGRYx15xOmHzJ7DCsyFCBPsscuU1dt9NxxxBhOxJx+8b69Xov2P51w==
-
 uniq@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/uniq/-/uniq-1.0.1.tgz#b31c5ae8254844a3a8281541ce2b04b865a734ff"

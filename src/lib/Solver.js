@@ -1,5 +1,4 @@
 import klona from 'klona'
-import uniqBy from 'uniq-by'
 import filterMutate from '@arr/filter.mutate'
 import filter from '@arr/filter'
 import flatten from '@arr/flatten'
@@ -20,7 +19,17 @@ export default class Solver {
     this.startTime = 0
     this.finishTime = 0
     this.detours = []
+    this.resetSolvedCells()
+  }
+
+  resetSolvedCells() {
     this.solvedCells = new Set()
+    let flatGrid = this.getFlattenedGrid()
+    for (let cell of flatGrid) {
+      if (cell.solved === true) {
+        this.solvedCells.add(cell.id)
+      }
+    }
   }
 
   start() {
@@ -44,13 +53,25 @@ export default class Solver {
   }
 
   get isSolved() {
-    return [...this.solvedCells].length === 81
+    return this.solvedCells.size === 81
   }
 
   getPossibleCellValues(row, col) {
     const allVals = new Set(map(this.getRelatedSolvedCells(row, col), it => it.value))
     // return a filtered list that excludes the solved values from the set above
     return filter(allPossibleCellValues, it => !allVals.has(it))
+  }
+
+  markCellSolved(cell) {
+    cell.solved = true
+    this.solvedCells.add(cell.id)
+    this.incrementCalculations()
+
+    if (this.isInDetours(cell)) {
+      // this cell was already in detours, but we just solved it. remove it.
+      filterMutate(this.detours, d => d.id !== cell.id)
+    }
+    this.setDetoursForSolvedCell(cell)
   }
 
   getCellsInRow(row) {
@@ -70,9 +91,9 @@ export default class Solver {
     let rows = map([0, 1, 2], r => r + startRow)
     let cols = map([0, 1, 2], c => c + startCol)
 
-    for (let row of rows) {
-      for (let column of cols) {
-        cells.push(this.grid[row][column])
+    for (let r of rows) {
+      for (let c of cols) {
+        cells.push(this.grid[r][c])
       }
     }
 
@@ -80,25 +101,81 @@ export default class Solver {
   }
 
   getRelatedCells(row, col) {
-    const thisCellId = `${row}.${col}`
-    const uniqById = uniqBy([
+    return [
       ...this.getCellsInColumn(col),
       ...this.getCellsInRow(row),
       ...this.getCellsInSquare(row, col)
-    ], 'id')
-    return filter(uniqById, it => it.id !== thisCellId)
+    ]
+  }
+
+  getAllRelatedCells(row, col) {
+    let related = this.getRelatedCells(row, col)
+    let seen = new Set()
+    seen.add(`${row}.${col}`)
+    let cells = []
+
+    for (let cell of related) {
+      if (!seen.has(cell.id)) {
+        seen.add(cell.id)
+        cells.push(cell)
+      }
+    }
+    return cells
+  }
+
+  getFilteredRelatedCells(row, col, val) {
+    let related = this.getRelatedCells(row, col)
+    let seen = new Set()
+    seen.add(`${row}.${col}`)
+    let cells = []
+
+    for (let cell of related) {
+      if (!seen.has(cell.id)) {
+        seen.add(cell.id)
+
+        if (cell.solved === val) {
+          cells.push(cell)
+        }
+      }
+    }
+    return cells
   }
 
   getRelatedUnsolvedCells(row, col) {
-    return filter(this.getRelatedCells(row, col), it => !it.solved)
+    return this.getFilteredRelatedCells(row, col, false)
+    // return this.getRelatedCells(row, col, x => !x.solved)
   }
 
   getRelatedSolvedCells(row, col) {
-    return filter(this.getRelatedCells(row, col), it => it.solved === true)
+    return this.getFilteredRelatedCells(row, col, true)
+    // let related = this.getRelatedCells(row, col)
+    // let seen = new Set()
+    // seen.add(`${row}.${col}`)
+    // let cells = []
+
+    // for (let cell of related) {
+    //   if (!seen.has(cell.id)) {
+    //     seen.add(cell.id)
+
+    //     if (cell.solved === true) {
+    //       cells.push(cell)
+    //     }
+    //   }
+    // }
+    // return cells
+    // return this.getRelatedCells(row, col, x => x.solved)
   }
 
   getAllUnsolvedCells() {
-    return filter(this.getFlattenedGrid(), it => it.solved === false)
+    let unsolved = []
+    for (let row of this.grid) {
+      for (let col of row) {
+        if (col.solved === false) {
+          unsolved.push(col)
+        }
+      }
+    }
+    return unsolved
   }
 
   getOptimalGuessCell() {
@@ -141,24 +218,22 @@ export default class Solver {
 
   revertSnapshot() {
     this.grid = this.snapshots.pop() // take the latest snapshot
-    this.solvedCells = new Set()
-    let flatGrid = this.getFlattenedGrid()
-    for (let cell of flatGrid) {
-      if (cell.solved === true) {
-        this.solvedCells.add(cell.id)
-      }
-    }
+    this.resetSolvedCells()
   }
 
   incrementCalculations() {
     this.calculations += 1
   }
 
+  isInDetours(cell) {
+    return some(this.detours, (it => it.id === cell.id))
+  }
+
   setDetoursForSolvedCell({ row, column }) {
     const unsolved = this.getRelatedUnsolvedCells(row, column)
 
     for (let cell of unsolved) {
-      const isInDetours = some(this.detours, (it => it.id === cell.id))
+      
 
       // we know the value of the solved cell, so update this cell's possible values to remove it.
       cell.possibleValues = this.getPossibleCellValues(cell.row, cell.column)
@@ -167,16 +242,8 @@ export default class Solver {
       if (cell.possibleValues.length === 1) {
         // we just solved another cell. set it to solved and don't add to our detours array.
         cell.value = cell.possibleValues[0]
-        cell.solved = true
-        this.solvedCells.add(cell.id)
-        this.incrementCalculations()
-
-        if (isInDetours) {
-          // this cell was already in detours, but we just solved it. remove it.
-          filterMutate(this.detours, d => d.id !== cell.id)
-        }
-        this.setDetoursForSolvedCell(cell)
-      } else if (!isInDetours) {
+        this.markCellSolved(cell)
+      } else if (!this.isInDetours(cell)) {
         // this item isn't in our array yet. add it
         this.detours.push(cell)
       }
@@ -230,9 +297,9 @@ export default class Solver {
         }
 
         if (cell.possibleValues.length === 1) {
+          cell.value = cell.possibleValues[0]
           cell.solved = true
           this.solvedCells.add(cell.id)
-          cell.value = cell.possibleValues[0]
           this.incrementCalculations()
           this.setDetoursForSolvedCell(cell)
         }
@@ -268,9 +335,9 @@ export default class Solver {
         }
 
         if (cell.possibleValues.length === 1) {
+          cell.value = cell.possibleValues[0]
           cell.solved = true
           this.solvedCells.add(cell.id)
-          cell.value = cell.possibleValues[0]
           this.incrementCalculations()
           this.setDetoursForSolvedCell(cell)
         }
@@ -281,12 +348,11 @@ export default class Solver {
       // we made it through without updating anything, start making assumptions.
       // find the most optimal unsolved cell to guess, try the first value, and take a snapshot.
       const cell = this.getOptimalGuessCell()
-      // console.log(`optimal guess cell is ${cell.id} with values ${cell.possibleValues.join(', ')}`)
       this.incrementCalculations()
 
       // grab first item in possible values, and remove it from the array
       let testVal
-      if (cell.possibleValues) {
+      if (cell.possibleValues !== undefined) {
         testVal = cell.possibleValues.shift()
       } else {
         // console.log('cell:', cell)
@@ -304,6 +370,7 @@ export default class Solver {
       cell.solved = true
       this.solvedCells.add(cell.id)
       this.incrementCalculations()
+      this.setDetoursForSolvedCell(cell)
     }
   }
 
