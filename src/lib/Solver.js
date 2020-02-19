@@ -19,10 +19,29 @@ export default class Solver {
     this.startTime = 0
     this.finishTime = 0
     this.detours = []
+    // this.methodInvocations = new Map()
     this.resetSolvedCells()
   }
 
+  incrementMethodInvocations(methodName) {
+    let val = 0
+    if (this.methodInvocations.has(methodName)) {
+      val = this.methodInvocations.get(methodName)
+    }
+    this.methodInvocations.set(methodName, val + 1)
+  }
+
+  logMethodInvocationCount() {
+    let entries = []
+    for (let entry of this.methodInvocations.entries()) {
+      entries.push(entry)
+    }
+    console.log('method invocation count:')
+    console.table(entries)
+  }
+
   resetSolvedCells() {
+    // this.incrementMethodInvocations('resetSolvedCells')
     this.solvedCells = new Set()
     let flatGrid = this.getFlattenedGrid()
     for (let cell of flatGrid) {
@@ -33,12 +52,14 @@ export default class Solver {
   }
 
   start() {
+    // this.incrementMethodInvocations('start')
     this.snapshots = []
     this.detours = []
     this.startTime = Date.now()
   }
 
   done() {
+    // this.incrementMethodInvocations('done')
     this.snapshots = []
     this.detours = []
     this.finishTime = Date.now()
@@ -57,12 +78,14 @@ export default class Solver {
   }
 
   getPossibleCellValues(row, col) {
+    // this.incrementMethodInvocations('getPossibleCellValues')
     const allVals = new Set(map(this.getRelatedSolvedCells(row, col), it => it.value))
     // return a filtered list that excludes the solved values from the set above
     return filter(allPossibleCellValues, it => !allVals.has(it))
   }
 
   markCellSolved(cell) {
+    // this.incrementMethodInvocations('markCellSolved')
     cell.solved = true
     this.solvedCells.add(cell.id)
     this.incrementCalculations()
@@ -75,14 +98,17 @@ export default class Solver {
   }
 
   getCellsInRow(row) {
+    // this.incrementMethodInvocations('getCellsInRow')
     return map(range, col => this.grid[row][col])
   }
 
   getCellsInColumn(col) {
+    // this.incrementMethodInvocations('getCellsInColumn')
     return map(range, row => this.grid[row][col])
   }
 
   getCellsInSquare(row, col) {
+    // this.incrementMethodInvocations('getCellsInSquare')
     let cells = []
     // Math FTW! row - row % 3 will give us the starting index of the current box,
     // so we can get the rows of this box by adding 0, 1, and 2 to that value.
@@ -101,6 +127,7 @@ export default class Solver {
   }
 
   getRelatedCells(row, col) {
+    // this.incrementMethodInvocations('getRelatedCells')
     return [
       ...this.getCellsInColumn(col),
       ...this.getCellsInRow(row),
@@ -109,6 +136,7 @@ export default class Solver {
   }
 
   getAllRelatedCells(row, col) {
+    // this.incrementMethodInvocations('getAllRelatedCells')
     let related = this.getRelatedCells(row, col)
     let seen = new Set()
     seen.add(`${row}.${col}`)
@@ -124,6 +152,7 @@ export default class Solver {
   }
 
   getFilteredRelatedCells(row, col, val) {
+    // this.incrementMethodInvocations('getFilteredRelatedCells')
     let related = this.getRelatedCells(row, col)
     let seen = new Set()
     seen.add(`${row}.${col}`)
@@ -142,31 +171,17 @@ export default class Solver {
   }
 
   getRelatedUnsolvedCells(row, col) {
+    // this.incrementMethodInvocations('getRelatedUnsolvedCells')
     return this.getFilteredRelatedCells(row, col, false)
-    // return this.getRelatedCells(row, col, x => !x.solved)
   }
 
   getRelatedSolvedCells(row, col) {
+    // this.incrementMethodInvocations('getRelatedSolvedCells')
     return this.getFilteredRelatedCells(row, col, true)
-    // let related = this.getRelatedCells(row, col)
-    // let seen = new Set()
-    // seen.add(`${row}.${col}`)
-    // let cells = []
-
-    // for (let cell of related) {
-    //   if (!seen.has(cell.id)) {
-    //     seen.add(cell.id)
-
-    //     if (cell.solved === true) {
-    //       cells.push(cell)
-    //     }
-    //   }
-    // }
-    // return cells
-    // return this.getRelatedCells(row, col, x => x.solved)
   }
 
   getAllUnsolvedCells() {
+    // this.incrementMethodInvocations('getAllUnsolvedCells')
     let unsolved = []
     for (let row of this.grid) {
       for (let col of row) {
@@ -179,6 +194,7 @@ export default class Solver {
   }
 
   getOptimalGuessCell() {
+    // this.incrementMethodInvocations('getOptimalGuessCell')
     // we try to find the unsolved cell with the fewest possible values remaining
     let curPossibilities = Infinity
     let optimalCell
@@ -199,6 +215,7 @@ export default class Solver {
   }
 
   setCell({ val, row, col }) {
+    // this.incrementMethodInvocations('setCell')
     // this only gets triggered when the user manually updates the value,
     // so we can assume that the cell is solved.
     const cell = {
@@ -213,23 +230,28 @@ export default class Solver {
   }
 
   addSnapshot(grid) {
+    // this.incrementMethodInvocations('addSnapshot')
     this.snapshots.push(grid)
   }
 
   revertSnapshot() {
+    // this.incrementMethodInvocations('revertSnapshot')
     this.grid = this.snapshots.pop() // take the latest snapshot
     this.resetSolvedCells()
   }
 
   incrementCalculations() {
+    // this.incrementMethodInvocations('incrementCalculations')
     this.calculations += 1
   }
 
   isInDetours(cell) {
+    // this.incrementMethodInvocations('isInDetours')
     return some(this.detours, (it => it.id === cell.id))
   }
 
   setDetoursForSolvedCell({ row, column }) {
+    // this.incrementMethodInvocations('setDetoursForSolvedCell')
     const unsolved = this.getRelatedUnsolvedCells(row, column)
 
     for (let cell of unsolved) {
@@ -251,11 +273,13 @@ export default class Solver {
   }
 
   getFlattenedGrid() {
+    // this.incrementMethodInvocations('getFlattenedGrid')
     // returns a flattened array for enabling single-pass loop through all grid cells
     return flatten(this.grid)
   }
 
   makePass() {
+    // this.incrementMethodInvocations('makePass')
     let hasUpdatedValues = false
     let hasReverted = false
     const cells = this.getFlattenedGrid()
@@ -384,5 +408,6 @@ export default class Solver {
     }
 
     this.done()
+    // this.logMethodInvocationCount()
   }
 }
