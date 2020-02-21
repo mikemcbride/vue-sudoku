@@ -5,11 +5,14 @@
         <h1>Sudoku Solver</h1>
         <Grid :grid="grid" @updated="setCell" />
       </div>
-      <p>Calculations required: {{ puzzle.calculations }}</p>
-      <p>Time to solve: {{ puzzle.solveTime }}</p>
-      <button @click="solve">Solve</button>
-      <button @click="clear">Clear Puzzle</button>
-      <ImportPuzzle @import="setPuzzle" />
+      <LoadingSpinner v-if="status === 'solving'" />
+      <div v-else>
+        <p>Calculations required: {{ puzzle.calculations }}</p>
+        <p>Time to solve: {{ puzzle.solveTime }}</p>
+        <button @click="solve">Solve</button>
+        <button v-if="status !== 'solving'" @click="clear">Clear Puzzle</button>
+        <ImportPuzzle @import="setPuzzle" />
+      </div>
     </section>
 
     <aside>
@@ -36,16 +39,22 @@ import parsePuzzle from '@/lib/parsePuzzle'
 import Solver from '@/lib/Solver'
 import Grid from '@/components/Grid'
 import ImportPuzzle from '@/components/ImportPuzzle'
+import LoadingSpinner from '@/components/LoadingSpinner'
+import SolveWorker from '@/workers/solve.worker'
+
+const sw = new SolveWorker()
 
 export default {
   name: 'Home',
   components: {
     Grid,
-    ImportPuzzle
+    ImportPuzzle,
+    LoadingSpinner
   },
   data() {
     return {
-      puzzle: new Solver(defaultGrid)
+      puzzle: new Solver(defaultGrid),
+      status: 'loaded'
     }
   },
   computed: {
@@ -54,8 +63,9 @@ export default {
     }
   },
   methods: {
-    solve() {
-      this.puzzle.solve()
+    async solve() {
+      this.status = 'solving'
+      new Promise(resolve => sw.postMessage(this.grid))
     },
     loadPuzzle(level) {
       let puzzle = parsePuzzle(puzzles[level])
@@ -74,7 +84,13 @@ export default {
     setCell(payload) {
       this.puzzle.setCell(payload)
     }
-  }
+  },
+  mounted() {
+    sw.onmessage = ({ data }) => {
+      this.puzzle = data
+      this.status = 'solved'
+    }
+  },
 }
 </script>
 
