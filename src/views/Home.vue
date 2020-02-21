@@ -5,7 +5,9 @@
         <h1>Sudoku Solver</h1>
         <Grid :grid="grid" @updated="setCell" />
       </div>
-      <LoadingSpinner v-if="status === 'solving'" />
+      <div v-if="status === 'solving'" class="loader">
+        <LoadingSpinner />
+      </div>
       <div v-else>
         <p>Calculations required: {{ puzzle.calculations }}</p>
         <p>Time to solve: {{ puzzle.solveTime }}</p>
@@ -111,6 +113,10 @@ export default {
   > div {
     margin-bottom: 2rem;
   }
+}
+
+.loader {
+  padding-top: 4rem;
 }
 
 textarea {
