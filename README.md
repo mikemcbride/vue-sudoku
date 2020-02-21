@@ -39,6 +39,7 @@ Each cell in the grid is an object containing some information about the cell:
 - a flag on whether or not it is solved
 - the column and row where it resides
 - an id that concatenates the row and column for faster find/filter (this is purely for array performance optimization)
+- an array of "related" cell ids - peer cells that are in the same row, column, or square. This is another performance optimization that reduces a lot of cycles spent looping through arrays of cells and getting these on the fly. Since these related cells are never changing, we can store them in the cell.
 
 Some example cell values:
 
@@ -49,7 +50,8 @@ Some example cell values:
   solved: false,
   row: 5,
   column: 1,
-  id: `5.1`
+  id: `5.1`,
+  relatedCells: ['5.0', '5.2', '5.3', '5.4', '5.5', '5.6', '5.7', '5.8', '0.1', '1.1', '2.1', '3.1', '4.1', '6.1', '7.1', '8.1', '3.0', '3.2', '4.0', '4.2']
 },
 {
   value: 2,
@@ -57,7 +59,8 @@ Some example cell values:
   solved: true,
   row: 3,
   column: 6,
-  id: `3.6`
+  id: `3.6`,
+  relatedCells: [...'you get the idea']
 }
 ```
 
@@ -65,7 +68,7 @@ Inside our `Solver` class, we keep track of a few other things in addition to th
 
 - The number of calculations (an integer)
 - The `snapshots`, for backtracking (an Array)
-- The `detours` (an Array)
+- The `detours` for checking related cells after solving a cell to see what values we can eliminate (an Array)
 - The start time and finish time (instances of `Date.now()`), which we use to display total time to solve the puzzle
 
 ## Puzzle Data for Development
