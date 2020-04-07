@@ -73,13 +73,15 @@ Inside our `Solver` class, we keep track of a few other things in addition to th
 
 ## Puzzle Data for Development
 
-There are four puzzles that can be pre-loaded. This is mostly for easier testing during development, but also useful to show the app working. For additional puzzles, check out the list in [puzzles.md](./puzzles.md) of [Dr. Arto Inkala's top 10 hardest sudoku](http://www.aisudoku.com/index_en.html).
+There are four puzzles that can be pre-loaded. This is mostly for easier testing during development, but also useful to show the app working. For additional puzzles, check out the list in [puzzles.md](./puzzles.md) of [Dr. Arto Inkala's top 10 hardest sudoku](http://www.aisudoku.com/index_en.html) and the [top 87 hardest](http://magictour.free.fr/topn87).
 
 ## Import a Puzzle
 
 You can import a puzzle using a textarea located beneath the puzzle grid. This app supports two formats for loading puzzles: Sudoku Puzzle format and Simple Sudoku format. See [this page](http://www.sudocue.net/fileformats.php) for more info on Sudoku file formats.
 
 ### Example Sudoku Puzzle file
+
+You can omit the newlines and put everything on one line if you want.
 
 ```
 2..1.5..3
