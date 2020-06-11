@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "12.x"
+    "node": ">=12.x"
   },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --modern",
-    "lint": "vue-cli-service lint",
     "dev": "vue-cli-service serve --open",
     "now-build": "vue-cli-service build --modern"
   },
@@ -22,20 +21,15 @@
     "@arr/some": "^1.0.1",
     "core-js": "^3.4.4",
     "klona": "^1.0.0",
-    "vue": "^2.6.5",
-    "vue-router": "^3.0.1"
+    "vue": "^2.6.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.2",
-    "@vue/cli-plugin-eslint": "^4.1.2",
     "@vue/cli-service": "^4.1.2",
-    "@vue/eslint-config-prettier": "^4.0.1",
     "babel-eslint": "^10.0.1",
-    "eslint": "^6.0.0",
-    "eslint-plugin-vue": "^6.0.0",
+    "comlink-loader": "^2.0.0",
     "sass": "^1.24.4",
     "sass-loader": "^8.0.1",
-    "vue-template-compiler": "^2.6.5",
-    "worker-loader": "^2.0.0"
+    "vue-template-compiler": "^2.6.5"
   }
 }

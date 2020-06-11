@@ -1,7 +1,7 @@
 import Solver from '@/lib/Solver'
 
-self.onmessage = ({ data }) => {
+export const solvePuzzle = async (data) => {
   const puzzle = new Solver(data)
   puzzle.solve()
-  self.postMessage(puzzle)
+  return puzzle
 }
