@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <div class="row">
     <Cell
       v-for="(cell, index) in row"
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import Cell from '@/components/Cell'
+import Cell from './Cell.vue'
 
 export default {
   name: 'Row',
@@ -36,11 +36,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.row {
-  display: flex;
-  height: 11vw;
-  max-height: 40px;
-}
-</style>

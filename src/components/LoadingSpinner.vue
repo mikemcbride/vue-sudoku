@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <div class="lds-grid">
     <div></div>
     <div></div>
@@ -14,11 +14,12 @@
 
 <script>
 export default {
-  name: 'MyComponent'
+  name: 'Spinner'
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
+/* Loading Spinner */
 .lds-grid {
   display: inline-block;
   position: relative;

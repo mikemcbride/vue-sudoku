@@ -1,5 +1,6 @@
-<template lang="html">
+<template>
   <div
+    class="cell"
     :class="{
       'box-top': boxTop,
       'box-bottom': boxBottom,
@@ -65,40 +66,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-div {
-  border: 1px solid #ccc;
-  margin: 0 -1px -1px 0;
-  max-width: 40px;
-  padding: 1px;
-  width: 11vw;
-
-  &.box-top {
-    border-top: 1px solid #777;
-  }
-  &.box-bottom {
-    border-bottom: 1px solid #777;
-  }
-  &.box-left {
-    border-left: 1px solid #777;
-  }
-  &.box-right {
-    border-right: 1px solid #777;
-  }
-}
-input {
-  border: 1px solid transparent;
-  border-radius: 0;
-  font-size: 18px;
-  height: 100%;
-  padding: 0;
-  text-align: center;
-  width: 100%;
-
-  &:focus {
-    border-color: dodgerblue;
-    outline: none;
-  }
-}
-</style>

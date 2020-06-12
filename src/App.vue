@@ -7,10 +7,10 @@
             <h1>Sudoku Solver</h1>
             <Grid :grid="grid" @updated="setCell" />
           </div>
-          <div v-if="status === 'solving'" class="loader">
+          <div v-show="showLoader" class="loader">
             <LoadingSpinner />
           </div>
-          <div v-else>
+          <div v-show="!showLoader">
             <p>Calculations required: {{ puzzle.calculations }}</p>
             <p>Time to solve: {{ puzzle.solveTime }}</p>
             <button @click="solve">Solve</button>
@@ -47,14 +47,14 @@
 </template>
 
 <script>
-import defaultGrid from '@/lib/defaultGrid'
-import puzzles from '@/lib/puzzles'
-import parsePuzzle from '@/lib/parsePuzzle'
-import Solver from '@/lib/Solver'
-import Grid from '@/components/Grid'
-import ImportPuzzle from '@/components/ImportPuzzle'
-import LoadingSpinner from '@/components/LoadingSpinner'
-import { solvePuzzle } from '@/workers/solve.worker'
+import defaultGrid from './lib/defaultGrid'
+import puzzles from './lib/puzzles'
+import parsePuzzle from './lib/parsePuzzle'
+import Solver from './lib/Solver'
+import Grid from './components/Grid.vue'
+import ImportPuzzle from './components/ImportPuzzle.vue'
+import LoadingSpinner from './components/LoadingSpinner.vue'
+import { solvePuzzle } from './workers/solve.worker'
 
 export default {
   name: 'App',
@@ -72,15 +72,23 @@ export default {
   computed: {
     grid() {
       return this.puzzle.grid
+    },
+    showLoader() {
+      return this.status === 'solving'
     }
   },
   methods: {
     async solve() {
       this.status = 'solving'
-      solvePuzzle(this.grid).then(res => {
-        this.puzzle = res
-        this.status = 'solved'
-      })
+      // this setTimeout is a dumb hack. The call kicks off,
+      // and the main thread seems to be blocked until it finishes.
+      // wrapping the solve call in a setTimeout seems to work.
+      setTimeout(() => {
+        solvePuzzle(this.grid).then(res => {
+          this.puzzle = res
+          this.status = 'solved'
+        })
+      }, 0)
     },
     loadPuzzle(level) {
       let puzzle = parsePuzzle(puzzles[level])
@@ -102,127 +110,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-html,
-body {
-  box-sizing: border-box;
-  margin: 0;
-}
-
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
-
-#app {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol';
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-main {
-  padding: 2rem 1rem;
-  flex: 1;
-}
-
-footer {
-  border-top: 1px solid #ccc;
-  padding: 2rem 1rem;
-  text-align: center;
-
-  a {
-    color: #0074d9;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
-.home {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-
-  @media all and (min-width: 768px) {
-    flex-direction: row-reverse;
-
-    section {
-      flex: 1;
-    }
-  }
-
-  > div {
-    margin-bottom: 2rem;
-  }
-}
-
-.loader {
-  padding-top: 4rem;
-}
-
-textarea {
-  background: #f5f6f7;
-  border: 1px solid #ccc;
-  border-radius: 0;
-  font-family: monospace;
-  font-size: 16px;
-  max-width: 400px;
-  resize: vertical;
-  padding: 0.5rem;
-  width: 100%;
-
-  &:focus {
-    border-color: #0074d9;
-    outline: none;
-  }
-}
-
-button {
-  border: none;
-  background: dodgerblue;
-  color: white;
-  cursor: pointer;
-  display: block;
-  font-size: 18px;
-  margin: 1rem auto;
-  padding: 6px 10px;
-  width: 300px;
-
-  &:hover {
-    background: #0074d9;
-  }
-}
-
-a {
-  color: #0074d9;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-section {
-  margin-bottom: 4rem;
-}
-
-.insane {
-  padding-top: 1rem;
-  button {
-    color: dodgerblue;
-    display: inline-block;
-    padding: 0 2px;
-    margin: 0 2px;
-    cursor: pointer;
-    width: auto;
-    background: #fff;
-  }
-}
-</style>

@@ -1,0 +1,171 @@
+html,
+body {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+#app {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol';
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  padding: 2rem 1rem;
+  flex: 1;
+}
+
+footer {
+  border-top: 1px solid #ccc;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+footer a {
+  color: #0074d9;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+
+.home {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+@media all and (min-width: 768px) {
+  .home {
+    flex-direction: row-reverse;
+  }
+
+  section {
+    flex: 1;
+  }
+}
+
+.home > div {
+  margin-bottom: 2rem;
+}
+
+.loader {
+  padding-top: 4rem;
+}
+
+textarea {
+  background: #f5f6f7;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  font-family: monospace;
+  font-size: 16px;
+  max-width: 400px;
+  resize: vertical;
+  padding: 0.5rem;
+  width: 100%;
+}
+textarea:focus {
+  border-color: #0074d9;
+  outline: none;
+}
+
+button {
+  border: none;
+  background: dodgerblue;
+  color: white;
+  cursor: pointer;
+  display: block;
+  font-size: 18px;
+  margin: 1rem auto;
+  padding: 6px 10px;
+  width: 300px;
+}
+
+button:hover {
+  background: #0074d9;
+}
+
+a {
+  color: #0074d9;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+section {
+  margin-bottom: 4rem;
+}
+
+.insane {
+  padding-top: 1rem;
+}
+
+.insane button {
+  color: dodgerblue;
+  display: inline-block;
+  padding: 0 2px;
+  margin: 0 2px;
+  cursor: pointer;
+  width: auto;
+  background: #fff;
+}
+
+.grid {
+  display: inline-block;
+}
+
+.row {
+  display: flex;
+  height: 11vw;
+  max-height: 40px;
+}
+
+.cell {
+  border: 1px solid #ccc;
+  margin: 0 -1px -1px 0;
+  max-width: 40px;
+  padding: 1px;
+  width: 11vw;
+}
+.cell.box-top {
+  border-top: 1px solid #777;
+}
+.cell.box-bottom {
+  border-bottom: 1px solid #777;
+}
+.cell.box-left {
+  border-left: 1px solid #777;
+}
+.cell.box-right {
+  border-right: 1px solid #777;
+}
+
+.cell input {
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-size: 18px;
+  height: 100%;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+}
+.cell input:focus {
+  border-color: dodgerblue;
+  outline: none;
+}
+
+.import-wrapper {
+  margin: 1rem 0;
+}
+
+.error {
+  margin-bottom: 1rem;
+  color: crimson;
+}

@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <div class="grid">
     <Row
       v-for="(row, index) in grid"
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Row from '@/components/Row'
+import Row from './Row.vue'
 export default {
   name: 'Grid',
   components: {
@@ -30,9 +30,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.grid {
-  display: inline-block;
-}
-</style>
