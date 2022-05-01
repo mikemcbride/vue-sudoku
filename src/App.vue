@@ -55,6 +55,7 @@ import Grid from './components/Grid.vue'
 import ImportPuzzle from './components/ImportPuzzle.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import { solvePuzzle } from './workers/solve.worker'
+import { klona } from 'klona/json'
 
 export default {
   name: 'App',
@@ -65,7 +66,7 @@ export default {
   },
   data() {
     return {
-      puzzle: new Solver(defaultGrid),
+      puzzle: Solver.setDefaultPuzzle(),
       status: 'loaded'
     }
   },
@@ -84,7 +85,8 @@ export default {
       // and the main thread seems to be blocked until it finishes.
       // wrapping the solve call in a setTimeout seems to work.
       setTimeout(() => {
-        solvePuzzle(this.grid).then(res => {
+        const grid = klona(this.grid)
+        solvePuzzle(grid).then(res => {
           this.puzzle = res
           this.status = 'solved'
         })
@@ -102,19 +104,11 @@ export default {
       this.puzzle = new Solver(puzzle)
     },
     clear() {
-      this.puzzle = new Solver(defaultGrid)
+      this.puzzle = Solver.setDefaultPuzzle()
     },
     setCell(payload) {
       this.puzzle.setCell(payload)
     }
-  },
-  mounted() {
-    const { timeZone, locale } = Intl.DateTimeFormat().resolvedOptions()
-    fetch('/api/pageview', {
-      method: 'POST',
-      body: JSON.stringify({ timeZone, locale }),
-      headers: { 'Content-Type': 'application/json' }
-    })
   }
 }
 </script>

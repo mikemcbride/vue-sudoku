@@ -1,7 +1,9 @@
-import klona from 'klona'
+import { klona } from 'klona/json'
 import filterMutate from '@arr/filter.mutate'
 import map from '@arr/map'
 import some from '@arr/some'
+import defaultGrid from './defaultGrid'
+import getRelatedCells from './getRelatedCells'
 
 // we will use these arrays to quickly map through all row and column indices
 const range = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -11,6 +13,7 @@ const allPossibleCellValues = map(range, it => it + 1)
 
 export default class Solver {
   constructor(grid = []) {
+      this.setRelatedCells(grid)
     this.grid = grid
     this.calculations = 0
     this.snapshots = []
@@ -20,6 +23,18 @@ export default class Solver {
     this.detours = []
     this.methodInvocations = new Map()
     this.resetSolvedCells()
+  }
+
+  static setDefaultPuzzle() {
+      return new Solver(klona(defaultGrid))
+  }
+
+  setRelatedCells(grid) {
+    for (let row of grid) {
+        for (let cell of row) {
+          cell.relatedCells = getRelatedCells(cell.row, cell.column)
+        }
+      }
   }
 
   incrementMethodInvocations(methodName) {
@@ -72,7 +87,8 @@ export default class Solver {
   getPossibleCellValues(row, col) {
     this.incrementMethodInvocations('getPossibleCellValues')
     let possibleVals = new Set(allPossibleCellValues)
-    for (let cell of this.getRelatedSolvedCells(row, col)) {
+    const solvedCells = this.getRelatedSolvedCells(row, col)
+    for (let cell of solvedCells) {
       possibleVals.delete(cell.value)
     }
     return [...possibleVals]
@@ -114,7 +130,8 @@ export default class Solver {
   getRelatedSolvedCells(row, col) {
     this.incrementMethodInvocations('getRelatedSolvedCells')
     let solved = []
-    for (let cell of this.getRelatedCells(row, col)) {
+    const relatedCells = this.getRelatedCells(row, col)
+    for (let cell of relatedCells) {
       if (this.solvedCells.has(cell.id)) {
         solved.push(cell)
       }
@@ -165,9 +182,10 @@ export default class Solver {
       value: val,
       solved: val === null ? false : true,
       possibleValues: val === null ? [...allPossibleCellValues] : [],
-      row: row, 
+      row: row,
       column: col,
-      id: `${row}.${col}`
+      id: `${row}.${col}`,
+      relatedCells: getRelatedCells(row, col)
     }
     this.grid[row][col] = cell
   }
@@ -306,9 +324,7 @@ export default class Solver {
       // grab first item in possible values, and remove it from the array
       let testVal
       if (cell.possibleValues !== undefined) {
-        testVal = cell.possibleValues.shift()
-      } else {
-        // console.log('cell:', cell)
+          testVal = cell.possibleValues.shift()
       }
 
       // take a snapshot NOW, so before we update the cell but after we've removed one possible value.

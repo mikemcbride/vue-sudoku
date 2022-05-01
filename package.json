@@ -17,11 +17,11 @@
     "@arr/map": "^1.0.1",
     "@arr/reduce": "^1.0.1",
     "@arr/some": "^1.0.1",
-    "klona": "^1.0.0",
-    "vue": "^3.0.0-beta.14"
+    "@vitejs/plugin-vue": "^2.3.1",
+    "klona": "^2.0.5",
+    "vue": "^3.2.33"
   },
   "devDependencies": {
-    "vite": "^0.20.0",
-    "@vue/compiler-sfc": "^3.0.0-beta.14"
+    "vite": "^2.9.6"
   }
 }

@@ -1,6 +1,6 @@
 const values = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 const range = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-import klona from 'klona'
+import { klona } from 'klona/json'
 
 const defaultCell = {
   value: null,
@@ -12,7 +12,8 @@ function buildRow(index) {
   return range.map(column => ({
     ...klona(defaultCell),
     row: index,
-    column
+    column,
+    id: `${index}.${column}`
   }))
 }
 
